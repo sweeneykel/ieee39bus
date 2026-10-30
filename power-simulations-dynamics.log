@@ -1,41 +1,41 @@
-┌ Info: 2026-10-22T05:35:29.601 [8482:1]: Pre-Initializing Simulation States
+┌ Info: 2026-10-30T19:05:34.525 [3660:1]: Pre-Initializing Simulation States
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:265
-┌ Info: 2026-10-22T05:35:29.602 [8482:1]: The TrustRegionACPowerFlow solver converged after 3 iterations.
+┌ Info: 2026-10-30T19:05:34.525 [3660:1]: The TrustRegionACPowerFlow solver converged after 3 iterations.
 └ @ PowerFlows /home/kelsey-sweeney/.julia/packages/PowerFlows/Ilrf1/src/powerflow_method.jl:314
-┌ Info: 2026-10-22T05:35:29.603 [8482:1]: PowerFlow solve converged, the results have been stored in the system
+┌ Info: 2026-10-30T19:05:34.526 [3660:1]: PowerFlow solve converged, the results have been stored in the system
 └ @ PowerFlows /home/kelsey-sweeney/.julia/packages/PowerFlows/Ilrf1/src/solve_ac_powerflow.jl:62
-┌ Info: 2026-10-22T05:35:29.614 [8482:1]: Residual from initial guess: max = 8.634034228312734e-9 at 242, total = 9.967228368122814e-8
+┌ Info: 2026-10-30T19:05:34.611 [3660:1]: Residual from initial guess: max = 1.2440707723252824e-8 at 217, total = 1.44037457770161e-7
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/nlsolve_wrapper.jl:115
-┌ Info: 2026-10-22T05:35:29.632 [8482:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+┌ Info: 2026-10-30T19:05:34.637 [3660:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/nlsolve_wrapper.jl:82
-┌ Info: 2026-10-22T05:35:29.632 [8482:1]: Attaching Perturbations
+┌ Info: 2026-10-30T19:05:34.637 [3660:1]: Attaching Perturbations
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:299
-┌ Info: 2026-10-22T05:35:29.632 [8482:1]: Simulations status = BUILT
+┌ Info: 2026-10-30T19:05:34.637 [3660:1]: Simulations status = BUILT
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:462
-┌ Info: 2026-10-22T05:35:29.632 [8482:1]: 
+┌ Info: 2026-10-30T19:05:34.637 [3660:1]: 
 │ ──────────────────────────────────────────────────────────────────────────────────────
 │                                                            Time          Allocations  
 │                                                      ───────────────   ───────────────
-│                    Total measured:                       32.2ms            33.4MiB    
+│                    Total measured:                        114ms            33.9MiB    
 │ 
 │ Section                                      ncalls     time    %tot     alloc    %tot
 │ ──────────────────────────────────────────────────────────────────────────────────────
-│ Build Simulation                                  1   32.2ms  100.0%   33.4MiB  100.0%
-│   Build Simulation Inputs                         1   1.32ms    4.1%    489KiB    1.4%
-│     Wrap Branches                                 1    145μs    0.4%   56.9KiB    0.2%
-│     Wrap Dynamic Injectors                        1    535μs    1.7%    166KiB    0.5%
-│     Calculate MM, DAE_vector, Total Shunts        1   91.4μs    0.3%   69.7KiB    0.2%
-│     Wrap Static Injectors                         1    112μs    0.3%   33.2KiB    0.1%
-│   Pre-initialization                              1   2.84ms    8.8%   1.12MiB    3.3%
-│     Power Flow solution                           1   1.21ms    3.8%    391KiB    1.1%
-│     Initialize Static Injectors                   1   2.37μs    0.0%     64.0B    0.0%
-│     Initialize Dynamic Injectors                  1   1.43ms    4.4%    720KiB    2.1%
-│     Initialize Dynamic Branches                   1   32.1μs    0.1%   14.9KiB    0.0%
-│   Calculate Jacobian                              1   9.28ms   28.8%   17.0MiB   50.9%
-│   Make Model Function                             1   9.50μs    0.0%   4.12KiB    0.0%
-│   Initial Condition NLsolve refinement            1   18.3ms   56.8%   14.7MiB   44.2%
-│   Build Perturbations                             1    201μs    0.6%   14.9KiB    0.0%
-│   Make DiffEq Problem                             1    184μs    0.6%   14.0KiB    0.0%
+│ Build Simulation                                  1    114ms  100.0%   33.9MiB  100.0%
+│   Build Simulation Inputs                         1   1.46ms    1.3%    495KiB    1.4%
+│     Wrap Branches                                 1    164μs    0.1%   56.9KiB    0.2%
+│     Wrap Dynamic Injectors                        1    496μs    0.4%    171KiB    0.5%
+│     Calculate MM, DAE_vector, Total Shunts        1    160μs    0.1%   70.2KiB    0.2%
+│     Wrap Static Injectors                         1    171μs    0.2%   33.2KiB    0.1%
+│   Pre-initialization                              1   2.66ms    2.3%   1.11MiB    3.3%
+│     Power Flow solution                           1   1.13ms    1.0%    391KiB    1.1%
+│     Initialize Static Injectors                   1   1.19μs    0.0%     64.0B    0.0%
+│     Initialize Dynamic Injectors                  1   1.29ms    1.1%    714KiB    2.1%
+│     Initialize Dynamic Branches                   1   38.0μs    0.0%   14.9KiB    0.0%
+│   Calculate Jacobian                              1   83.6ms   73.4%   17.3MiB   51.0%
+│   Make Model Function                             1   7.12μs    0.0%   4.34KiB    0.0%
+│   Initial Condition NLsolve refinement            1   25.8ms   22.6%   15.0MiB   44.2%
+│   Build Perturbations                             1    173μs    0.2%   14.9KiB    0.0%
+│   Make DiffEq Problem                             1    167μs    0.1%   14.0KiB    0.0%
 │ ──────────────────────────────────────────────────────────────────────────────────────
 │ 
 └ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:487

@@ -15,3 +15,9 @@ Method: last sample + mean/std over last 2.00 s
     38   -0.004121     -0.004121      0.000002      2001  [  8.00,  10.00]  (Bus 38 (SG), ω)
     39   -0.004131     -0.004135      0.000003      2001  [  8.00,  10.00]  (Bus 39 (SG), ω)
 ================================================================================
+
+-bus placement
+-load placement
+-number of GFL 
+-PLL coefficients
+-load

@@ -1128,7 +1128,7 @@ function save_frequency_csv_for_bus(results, sys::System, bus::Int, outdir::Stri
 end
 
 """
-Using already generated CSV files, constructs a new CSV file in following format:
+Using already generated CSV files freq_bus_0#_julia.csv, constructs a new CSV file in following format:
 t_s, df_hz_bus30, df_hz_bus31, df_hz_bus32
 0.0, 0.0, 0.0, 0.0
 0.1, 0.01, 0.02, -0.01
@@ -1218,7 +1218,7 @@ end
 Plots the max absolute frequency deviation over all time steps for all buses for a given independent_variable.
     Does this for for increasing values a given independent_variable.
 """
-function plot_max_freq_deviation(csv_path::String, independent_var::String)
+function plot_max_freq_deviation(csv_path::String, independent_var::String, load_event_summary)
 
     # Read CSV
     df = CSV.read(csv_path, DataFrame)
@@ -1239,7 +1239,7 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String)
     p = plot(
         xlabel = independent_var,
         ylabel = "Δ Frequency (Hz)",
-        title = "Maximum Absolute System Frequency Deviation",
+        title = build_panel_title_julia("Maximum Absolute System Frequency Deviation", load_event_summary),
         legend = :outerright,
         grid = true,
         bottom_margin = 5Plots.mm
@@ -2477,10 +2477,13 @@ end
 
 """
 WHen given a df of:
-t_s, df_hz_bus30, df_hz_bus31, df_hz_bus32
+t_s, df_hz_bus30, df_hz_bus31, df_hz_bus32...
 0.0, 0.0, 0.0, 0.0
 0.1, 0.01, 0.02, -0.01
 0.2, 0.02, 0.03, -0.02
+
+and the steady state frequency of a list of buses
+ss_df_hz_bus30, ss_df_hz_bus31, ss_df_hz_bus32...
 
 returns time after which distance <= epsilon 
 and
@@ -2521,6 +2524,31 @@ function find_settling_time(
     else
         return t[last_violation + 1], distances          # ideal case
     end
+end
+
+function distance_epsilon(csv_path::String, independent_var::String, load_event_summary, epsilon_value)
+
+    df = CSV.read(csv_path, DataFrame)
+    sort!(df, :independent_variable)
+
+    p = scatter(
+        df.independent_variable,
+        df.settling_time;
+        xlabel = independent_var,
+        ylabel = "Time [s]",
+        title = build_panel_title_julia(
+            "Time at which norm2(change in frequency - frequency steady state) <= $(epsilon_value)",
+            load_event_summary
+        ),
+        markersize = 5,
+        legend = false,
+        grid = true,
+        size = (900, 600),
+        margin = 10Plots.mm
+    )
+
+    display(p)
+    return p
 end
 
 # Small-signal stability check
@@ -3118,7 +3146,7 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         @info "Saved system max abs frequency deviation" file = fpath 
 
         # Generate and Save Plots
-        p = plot_max_freq_deviation(fpath, independent_variable)
+        p = plot_max_freq_deviation(fpath, independent_variable, load_event_summary)
         savefig(p, joinpath(maxabsfreqdir, "max_abs_freq_dev_x_$(independent_variable).png"))
         savefig(p, joinpath(maxabsfreqdir, "max_abs_freq_dev_x_$(independent_variable).pdf"))
 
@@ -3126,37 +3154,47 @@ function main(;independent_variable::String, changing_param_value::Float64, show
 
 # Frequency Deviation Distance One Iteration---------------------------------------------------------------------------------------------------------------------------------------
     if test_frequency_dev_distance == true
-        # get frequency dev steady state values for all buses and put into a vector
-        (Δf_last_vector, Δf_mean_vector, Δf_std_vector) = get_final_steady_state_freq_vector(results, sys; buses = gen_buses)
-
-        # Paths and locations
+        
         freqdevdir = joinpath(pwd(), "test_freq_dev_distance_x_$(independent_variable)")
         mkpath(freqdevdir)
+       
+    
+        # Get steady state frequency deviation. Δf_ss
+        (Δf_last_vector, Δf_mean_vector, Δf_std_vector) = get_final_steady_state_freq_vector(results, sys; buses = gen_buses)
 
-        # combine all freq deviation information into a single matrix
+
+        # Using existing freq_bus0#_julia.csv files, combine all freq deviation into a single matrix
+        # t_s, df_hz_bus30, df_hz_bus31, df_hz_bus32...
         df_combined = combine_frequency_csvs(csvdir, independent_variable, changing_param_value; buses = collect(30:39))
 
-        # and save that combined CSV
+        # Save the df
         fname = "freq_dev_distance_x_$(independent_variable)=$(changing_param_value).csv"
         outpath = joinpath(freqdevdir, fname)
         CSV.write(outpath, df_combined)
+
 
         # Find Settling Time
         dist_ε = 0.001
         (settle_time, distance_vect) = find_settling_time(df_combined, Δf_last_vector; dist_ε)
 
-        # format what should be stored
+        # Add and save the settling time to a single CSV file 
         df_save = DataFrame(independent_variable=changing_param_value, settling_time=settle_time)
-
         fname_sys = "settle_time_x_$(independent_variable).csv"
         fpath = joinpath(freqdevdir, fname_sys)
-
-        # check if file exists and has content (>0 bytes)
         file_has_data = isfile(fpath) && filesize(fpath) > 0
-
-        # append without re-writing the header if the file already contains data
         CSV.write(fpath, df_save; append = file_has_data, writeheader = !file_has_data)
-        
+
+
+        # Add and save the distance_vector to a single CSV file
+        df_distance_vect = DataFrame(calc_distance = distance_vect)
+        fname_dist = "distance_x_time_@$(independent_variable)=$(changing_param_value).csv"
+        fpath_dist = joinpath(freqdevdir, fname_dist)
+        CSV.write(fpath_dist, df_distance_vect)
+
+        # Make Plot
+        p = distance_epsilon(fpath, independent_variable, load_event_summary, dist_ε)
+        savefig(p, joinpath(freqdevdir, "settle_time_x_$(independent_variable).pdf"))
+        savefig(p, joinpath(freqdevdir, "settle_time_x_$(independent_variable).png"))
     end
 
 # Per-bus rotor-angle plots
@@ -3274,6 +3312,11 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         left_margin = 10Plots.mm, right_margin = 4Plots.mm, bottom_margin = 6Plots.mm)
     savefig(combined, joinpath(plotsdir, "ieee39_combined_freq_rotor_pm.png"))
     savefig(combined, joinpath(plotsdir, "ieee39_combined_freq_rotor_pm.pdf"))
+
+    simdir = joinpath(outdir, "test_combined_freq_x_$(independent_variable)")
+    mkpath(simdir)
+    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).png"))
+    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).pdf"))
     @info "Saved combined 3-panel preview" folder = plotsdir
 
     if show_plot
@@ -3284,4 +3327,4 @@ function main(;independent_variable::String, changing_param_value::Float64, show
     return sys, results
 end
 
-main(independent_variable = "GFL_KW", changing_param_value = 35.0, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
+main(independent_variable = "Droop Constant with 4 GFL Buses", changing_param_value = 34.0, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
