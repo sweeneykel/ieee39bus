@@ -3367,4 +3367,4 @@ function main(;independent_variable::String, changing_param_value::Float64, show
     return sys, results
 end
 
-main(independent_variable = "Droop Constant with 4 GFL Buses visual", changing_param_value = 34.0, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
+main(independent_variable = "GFL_PLL_KP", changing_param_value = GFL_PLL_KP, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
