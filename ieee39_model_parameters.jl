@@ -1,6 +1,5 @@
 # IEEE-39 model parameters
 
-
 const SYS_BASE_MVA = 100.0     #System base[MVA]
 const F_BASE       = 60.0      #Nominal frequency[Hz]
 const Ω_BASE_RAD_S = 2π * F_BASE     #Nominal angular frequency[rad/s]

@@ -624,6 +624,17 @@ function fault_event_summary_string()
     end
 end
 
+"""
+Lists all parameters that can be changed to make it easier to understand context of graphs. 
+"""
+function simulation_parameters_string(load_event_summary)
+    return join([
+        "$(load_event_summary)",
+        "SG: $(SG_BUSES) | GFM: $(GFM_BUSES) | GFL: $(GFL_BUSES) | PLL Kp: $(GFL_PLL_KP) | PLL Ki: $(GFL_PLL_KI)",
+        "Kw: $(GFL_KW_DEFAULT) | Kw map: $(GFL_KW_map_ext)",
+    ], "  \n  ")
+end
+
 function print_bus_3ph_fault_line_trip_schedule()
     println("\n" * "="^118)
     println("BUS-FAULT + LINE-TRIP DISTURBANCE SCHEDULE")
@@ -1218,7 +1229,7 @@ end
 Plots the max absolute frequency deviation over all time steps for all buses for a given independent_variable.
     Does this for for increasing values a given independent_variable.
 """
-function plot_max_freq_deviation(csv_path::String, independent_var::String, load_event_summary)
+function plot_max_freq_deviation(csv_path::String, independent_var::String, changing_param_summary)
 
     # Read CSV
     df = CSV.read(csv_path, DataFrame)
@@ -1236,13 +1247,15 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String, load
     )
 
     # Initialize plot
-    p = plot(
+    p1 = plot(
         xlabel = independent_var,
         ylabel = "Δ Frequency (Hz)",
-        title = build_panel_title_julia("Maximum Absolute System Frequency Deviation", load_event_summary),
-        legend = :outerright,
+        title = "Maximum Absolute System Frequency Deviation",
+        legend = :topright,
         grid = true,
-        bottom_margin = 5Plots.mm
+        left_margin = 5Plots.mm,
+        top_margin = 5Plots.mm,
+        right_margin = 5Plots.mm
     )
 
     # Scatter plot, grouped by bus number
@@ -1251,7 +1264,7 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String, load
         bus_df = df[df.bus .== bus, :]
 
         scatter!(
-            p,
+            p1,
             bus_df.independent_variable,
             bus_df.max_abs_sys_freq_dev,
             label = "Bus $bus",
@@ -1260,6 +1273,21 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String, load
             markerstrokewidth = 0
         )
     end
+
+    p2 = plot(
+        framestyle = :none,
+        axis = false,
+        ticks = false,
+        annotations = (0.0, 0.5, text(changing_param_summary, 8, :left)),
+        xlims = (0, 1),
+        ylims = (0, 1)
+    )
+
+    p = plot(
+        p1, p2,
+        layout = grid(2, 1, heights = [0.90, 0.10]),
+        size = (1000, 850)
+    )
 
     display(p)
 
@@ -2526,25 +2554,38 @@ function find_settling_time(
     end
 end
 
-function distance_epsilon(csv_path::String, independent_var::String, load_event_summary, epsilon_value)
+function distance_epsilon(csv_path::String, independent_var::String, changing_param_summary, epsilon_value)
 
     df = CSV.read(csv_path, DataFrame)
     sort!(df, :independent_variable)
 
-    p = scatter(
+    p1 = scatter(
         df.independent_variable,
         df.settling_time;
         xlabel = independent_var,
         ylabel = "Time [s]",
-        title = build_panel_title_julia(
-            "Time at which norm2(change in frequency - frequency steady state) <= $(epsilon_value)",
-            load_event_summary
-        ),
+        title = "Time at which norm2(change in frequency - frequency steady state) <= $(epsilon_value)",
         markersize = 5,
         legend = false,
         grid = true,
-        size = (900, 600),
-        margin = 10Plots.mm
+        left_margin = 5Plots.mm,
+        top_margin = 10Plots.mm,
+        right_margin = 5Plots.mm
+    )
+
+    p2 = plot(
+        xlims = (0, 1),
+        ylims = (0, 1),
+        framestyle = :none,
+        axis = false,
+        ticks = false,
+        annotations = (0.0, 0.5, text(changing_param_summary, 8, :left))
+        )
+
+    p = plot(
+        p1, p2,
+        layout = grid(2, 1, heights = [0.90, 0.10]),
+        size = (1000, 850)
     )
 
     display(p)
@@ -2942,6 +2983,8 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         print_fault_disturbance_schedule()
     end
 
+    changing_param_summary = simulation_parameters_string(load_event_summary)
+
     casefile = joinpath(outdir, "modified_ieee39.m")
     write_modified_ieee39_case(casefile)
     @info "Wrote MATPOWER case" file = casefile
@@ -3116,11 +3159,11 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         savefig(p, joinpath(freqpdfdir, @sprintf("freq_bus%02d.png", b)))
     end
 
-# Max Frequency Study One Iteration----------------------------------------------------------------------------------------------------------------------------------
+# Kelsey absapex test (Max Frequency Deviation)----------------------------------------------------------------------------------------------------------------------------------
     if test_max_abs_freq == true
 
         # Get the max abs frequency deviation for each bus (positive or negative)
-        maxabsfreqdir = joinpath(pwd(), "test_max_abs_freq_dev_x_$(independent_variable)")
+        maxabsfreqdir = joinpath(pwd(), "[test]_max_abs_freq_dev_x_$(independent_variable)")
         fname_bus = "each_bus_max_abs_freq_dev_x_$(independent_variable)=$(changing_param_value).csv"
         for b in gen_buses                  # 30...39  
             # Save each bus' max abs frequency value in a shared CSV file            
@@ -3146,22 +3189,20 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         @info "Saved system max abs frequency deviation" file = fpath 
 
         # Generate and Save Plots
-        p = plot_max_freq_deviation(fpath, independent_variable, load_event_summary)
+        p = plot_max_freq_deviation(fpath, independent_variable, changing_param_summary)
         savefig(p, joinpath(maxabsfreqdir, "max_abs_freq_dev_x_$(independent_variable).png"))
         savefig(p, joinpath(maxabsfreqdir, "max_abs_freq_dev_x_$(independent_variable).pdf"))
 
     end
 
-# Frequency Deviation Distance One Iteration---------------------------------------------------------------------------------------------------------------------------------------
+# Kelsey norm2 test (Distance - steady state) < epsilon ---------------------------------------------------------------------------------------------------------------------------------------
     if test_frequency_dev_distance == true
         
-        freqdevdir = joinpath(pwd(), "test_freq_dev_distance_x_$(independent_variable)")
+        freqdevdir = joinpath(pwd(), "[test]_freq_dev_distance_x_$(independent_variable)")
         mkpath(freqdevdir)
        
-    
         # Get steady state frequency deviation. Δf_ss
         (Δf_last_vector, Δf_mean_vector, Δf_std_vector) = get_final_steady_state_freq_vector(results, sys; buses = gen_buses)
-
 
         # Using existing freq_bus0#_julia.csv files, combine all freq deviation into a single matrix
         # t_s, df_hz_bus30, df_hz_bus31, df_hz_bus32...
@@ -3171,7 +3212,6 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         fname = "freq_dev_distance_x_$(independent_variable)=$(changing_param_value).csv"
         outpath = joinpath(freqdevdir, fname)
         CSV.write(outpath, df_combined)
-
 
         # Find Settling Time
         dist_ε = 0.001
@@ -3192,7 +3232,7 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         CSV.write(fpath_dist, df_distance_vect)
 
         # Make Plot
-        p = distance_epsilon(fpath, independent_variable, load_event_summary, dist_ε)
+        p = distance_epsilon(fpath, independent_variable, changing_param_summary, dist_ε)
         savefig(p, joinpath(freqdevdir, "settle_time_x_$(independent_variable).pdf"))
         savefig(p, joinpath(freqdevdir, "settle_time_x_$(independent_variable).png"))
     end
@@ -3313,7 +3353,7 @@ function main(;independent_variable::String, changing_param_value::Float64, show
     savefig(combined, joinpath(plotsdir, "ieee39_combined_freq_rotor_pm.png"))
     savefig(combined, joinpath(plotsdir, "ieee39_combined_freq_rotor_pm.pdf"))
 
-    simdir = joinpath(outdir, "test_combined_freq_x_$(independent_variable)")
+    simdir = joinpath(outdir, "[test]$(independent_variable)_x_combined_freq_rotor_pm")
     mkpath(simdir)
     savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).png"))
     savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).pdf"))
@@ -3327,4 +3367,4 @@ function main(;independent_variable::String, changing_param_value::Float64, show
     return sys, results
 end
 
-main(independent_variable = "Droop Constant with 4 GFL Buses", changing_param_value = 34.0, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
+main(independent_variable = "Droop Constant with 4 GFL Buses visual", changing_param_value = 34.0, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
