@@ -3367,4 +3367,4 @@ function main(;independent_variable::String, changing_param_value::Float64, show
     return sys, results
 end
 
-main(independent_variable = "GFL_PLL_KP", changing_param_value = GFL_PLL_KP, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
+main(independent_variable = "GFL_KW_DEFAULT (6 GLF BUS)", changing_param_value = GFL_KW_DEFAULT, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)

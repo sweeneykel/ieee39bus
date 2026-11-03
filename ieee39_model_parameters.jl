@@ -27,9 +27,9 @@ const SOLVER_DTMAX     = 1e-3   #Maximum solver step[s] #  IDA maximum step[s]  
 #SG/GFM/GFL bus groups
 
 
-const SG_BUSES  = [33, 35, 37, 38, 39]      #Synchronous-generator buses
+const SG_BUSES  = [35, 39]      #Synchronous-generator buses
 const GFM_BUSES = [31, 36]       #Grid-forming inverter buses
-const GFL_BUSES = [30, 34, 32]         #Grid-following inverter buses
+const GFL_BUSES = [30, 34, 32, 33, 37, 38]         #Grid-following inverter buses
 const PLOT_BUSES_EXT = [30, 31, 34, 36, 35]               #Buses shown in plots
 
 const R_SG_PU  = 0.05              #SG speed droop[p.u.]
@@ -43,7 +43,7 @@ const R_GFM_PU = 0.08      #GFM speed droop[p.u.]
 
 
 const GFL_PLL_KP = 0.03    #PLL Kp
-const GFL_PLL_KI = 1.5          #PLL Ki
+const GFL_PLL_KI = 1.5         #PLL Ki
 
 
 #Important Note to User  regarding GFL  kω_droop::Float64 = GFL_KW_DEFAULT
@@ -56,8 +56,7 @@ const GFL_PLL_KI = 1.5          #PLL Ki
 # use the default ActivePowerPI constructor   
 
 
-
-const GFL_KW_DEFAULT = 75.0         #GFL frequency-droop gain
+const GFL_KW_DEFAULT = 35.0         #GFL frequency-droop gain
 const GFL_KW_map_ext = Dict{Int,Float64}(
     30 => GFL_KW_DEFAULT,              #Bus 30 GFL frequency-droop gain
     31 => GFL_KW_DEFAULT,                    #Bus 31 GFL frequency-droop gain
