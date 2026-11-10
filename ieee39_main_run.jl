@@ -2491,6 +2491,8 @@ function get_final_steady_state_freq_vector(results, sys::System; buses::Vector{
 
         t, df, lab, sym = series
 
+        # tail stats are the last value, mean value over past x seconds, 
+        # standard deviation over past x seconds, etc
         y_last, μ, σ, n_tail, (t0, t1) = tail_stats(
             t, df; tail_seconds = tail_seconds
         )
