@@ -1252,6 +1252,7 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String, chan
         ylabel = "Δ Frequency (Hz)",
         title = "Maximum Absolute System Frequency Deviation",
         legend = :topright,
+        ylims = (0.01980, 0.02075),
         grid = true,
         left_margin = 5Plots.mm,
         top_margin = 5Plots.mm,
@@ -2565,6 +2566,7 @@ function distance_epsilon(csv_path::String, independent_var::String, changing_pa
         xlabel = independent_var,
         ylabel = "Time [s]",
         title = "Time at which norm2(change in frequency - frequency steady state) <= $(epsilon_value)",
+        ylims = (1.50, 2.10),
         markersize = 5,
         legend = false,
         grid = true,
@@ -3223,7 +3225,6 @@ function main(;independent_variable::String, changing_param_value::Float64, show
         fpath = joinpath(freqdevdir, fname_sys)
         file_has_data = isfile(fpath) && filesize(fpath) > 0
         CSV.write(fpath, df_save; append = file_has_data, writeheader = !file_has_data)
-
 
         # Add and save the distance_vector to a single CSV file
         df_distance_vect = DataFrame(calc_distance = distance_vect)
