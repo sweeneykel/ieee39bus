@@ -1,0 +1,24 @@
+# Configuration 1
+const SG_BUSES  = [30, 34, 35, 39]
+const GFM_BUSES = [31, 36]
+const GFL_BUSES = [32, 33, 37, 38]
+
+# Configuration 2
+const SG_BUSES  = [34, 35, 37, 39]
+const GFM_BUSES = [31, 36]
+const GFL_BUSES = [30, 32, 33, 38]
+
+# Configuration 3
+const SG_BUSES  = [35, 37, 38, 39]
+const GFM_BUSES = [31, 36]
+const GFL_BUSES = [30, 32, 33, 34]
+
+# Configuration 4
+const SG_BUSES  = [30, 32, 35, 39]
+const GFM_BUSES = [31, 36]
+const GFL_BUSES = [33, 34, 37, 38]
+
+# Configuration 5
+const SG_BUSES  = [30, 35, 37, 39]
+const GFM_BUSES = [31, 36]
+const GFL_BUSES = [32, 33, 34, 38]
