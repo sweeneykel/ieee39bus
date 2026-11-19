@@ -62,7 +62,7 @@ const FAULT_X_PU = 0.0   # Fault reactance [pu]
 const LOAD_CHANGE_EVENTS = [
     Dict(
         :buses        => [35],                            #Buses with load-step events
-        :event_time_s => 0.1,                             #Load-step time[s]
+        :event_time_s => 0.5,                             #Load-step time[s]
         :p_pu_map     => Dict(35 => 70.0 / SYS_BASE_MVA), #Active-power load step[p.u.]
         :q_pu_map     => Dict(35 => 10.0 / SYS_BASE_MVA), #Reactive-power load step[p.u.]
     ),
@@ -631,7 +631,6 @@ function simulation_parameters_string(load_event_summary)
     return join([
         "$(load_event_summary)",
         "SG: $(SG_BUSES) | GFM: $(GFM_BUSES) | GFL: $(GFL_BUSES) | PLL Kp: $(GFL_PLL_KP) | PLL Ki: $(GFL_PLL_KI)",
-        "Kw: $(GFL_KW_DEFAULT) | Kw map: $(GFL_KW_map_ext)",
     ], "  \n  ")
 end
 

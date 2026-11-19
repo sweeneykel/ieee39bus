@@ -56,7 +56,7 @@ const GFL_PLL_KI = 1.5         #PLL Ki
 # use the default ActivePowerPI constructor   
 
 
-const GFL_KW_DEFAULT = 35.0         #GFL frequency-droop gain
+const GFL_KW_DEFAULT = 19.0         #GFL frequency-droop gain
 const GFL_KW_map_ext = Dict{Int,Float64}(
     30 => GFL_KW_DEFAULT,              #Bus 30 GFL frequency-droop gain
     31 => GFL_KW_DEFAULT,                    #Bus 31 GFL frequency-droop gain
