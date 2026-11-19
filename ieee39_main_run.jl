@@ -57,13 +57,12 @@ const FAULT_R_PU = 0.007 # Fault resistance [pu]
 const FAULT_X_PU = 0.0   # Fault reactance [pu]
 
 # Load-step case
-
 #For larger sudden load steps, tighten solver tolerances for numerical stability
 const LOAD_CHANGE_EVENTS = [
     Dict(
         :buses        => [35],                            #Buses with load-step events
-        :event_time_s => 0.1,                             #Load-step time[s]
-        :p_pu_map     => Dict(35 => 70.0 / SYS_BASE_MVA), #Active-power load step[p.u.]
+        :event_time_s => 0.5,                             #Load-step time[s]
+        :p_pu_map     => Dict(35 => 200.0 / SYS_BASE_MVA), #Active-power load step[p.u.]
         :q_pu_map     => Dict(35 => 10.0 / SYS_BASE_MVA), #Reactive-power load step[p.u.]
     ),
 ]
@@ -1261,6 +1260,7 @@ function plot_max_freq_deviation(csv_path::String, independent_var::String, chan
         fillcolor = :steelblue,
         linealpha = 0,
         label = "Min–Max Range",
+        ylims = (0.05 , 0.08),
         xlabel = independent_var,
         ylabel = "Δ Frequency (Hz)",
         title = "Maximum Absolute System Frequency Deviation",
@@ -2594,7 +2594,7 @@ function distance_epsilon(csv_path::String, independent_var::String, changing_pa
         xlabel = independent_var,
         ylabel = "Time [s]",
         title = "Time at which norm2(change in frequency - frequency steady state) <= $(epsilon_value)",
-        ylims = (1.50, 2.10),
+        ylims = (2.00, 4.00),
         grid = true,
         left_margin = 5Plots.mm,
         top_margin = 10Plots.mm,
@@ -3201,6 +3201,8 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
 
         # Get the max abs frequency deviation for each bus (positive or negative)
         maxabsfreqdir = joinpath(pwd(), "[test]_max_abs_freq_dev_x_$(independent_variable)")
+        
+   #=     
         fname_bus = "each_bus_max_abs_freq_dev_x_$(independent_variable)=$(changing_param_value)_[$(GFL_bus_list)].csv"
         for b in gen_buses                  # 30...39  
             # Save each bus' max abs frequency value in a shared CSV file            
@@ -3220,13 +3222,15 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
                 GFL_list=[string((df.GFL_list)[row_idx_max])]
         )
 
+    =#    
         # storing
         fname_sys = "system_max_abs_freq_dev_x_$(independent_variable).csv"
         fpath = joinpath(maxabsfreqdir, fname_sys)
-        file_has_data = isfile(fpath) && filesize(fpath) > 0
-        CSV.write(fpath, df_save; append = file_has_data, writeheader = !file_has_data)
+  #      file_has_data = isfile(fpath) && filesize(fpath) > 0
+  #      CSV.write(fpath, df_save; append = file_has_data, writeheader = !file_has_data)
 
-        @info "Saved system max abs frequency deviation" file = fpath 
+  #      @info "Saved system max abs frequency deviation" file = fpath 
+
 
         # Generate and Save Plots
         p = plot_max_freq_deviation(fpath, independent_variable, changing_param_summary)
@@ -3236,13 +3240,13 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
 
 # Kelsey norm2 test (Distance - steady state) < epsilon ---------------------------------------------------------------------------------------------------------------------------------------
     if test_frequency_dev_distance == true
-        
+    
         # Make a directory for all tests
         freqdevdir = joinpath(pwd(), "[test]_freq_dev_distance_x_$(independent_variable)")
         mkpath(freqdevdir)
        
 
-
+#=
         # Get metrics on the final 2 seconds of the simulation
         final_steady_state_stats_df = get_final_steady_state_freq_df(results, sys; buses = gen_buses)
         fname_final_ss = "final_steady_state_stats_dev_x_$(independent_variable)=$(changing_param_value)_[$(GFL_bus_list)].csv"
@@ -3261,23 +3265,23 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
 
 
 
-
+=#
         # Find Settling Time
-        dist_ε = 0.001
-        (settle_time, distance_vect) = find_settling_time(df_combined, final_steady_state_stats_df.Δf_last; dist_ε)
+        dist_ε = 0.0009
+  #      (settle_time, distance_vect) = find_settling_time(df_combined, final_steady_state_stats_df.Δf_last; dist_ε)
 
 
 
 
         # Add and save the settling time to a single CSV file 
-        df_settle_time = DataFrame(
-                independent_variable = [changing_param_value],
-                settling_time = [settle_time],
-                glf_included = [string(GFL_bus_list)])
+   #     df_settle_time = DataFrame(
+   #             independent_variable = [changing_param_value],
+   #             settling_time = [settle_time],
+   #             glf_included = [string(GFL_bus_list)])
         fname_settle = "settle_time_x_$(independent_variable).csv"
         fpath_settle = joinpath(freqdevdir, fname_settle)
-        file_has_data = isfile(fpath_settle) && filesize(fpath_settle) > 0
-        CSV.write(fpath_settle, df_settle_time; append = file_has_data, writeheader = !file_has_data)
+  #      file_has_data = isfile(fpath_settle) && filesize(fpath_settle) > 0
+  #      CSV.write(fpath_settle, df_settle_time; append = file_has_data, writeheader = !file_has_data)
 
         # Add and save the distance_vector to a single CSV file
         # df_distance_vect = DataFrame(calc_distance = distance_vect)
@@ -3410,8 +3414,8 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
 
     simdir = joinpath(outdir, "[test]$(independent_variable)_x_combined_freq_rotor_pm")
     mkpath(simdir)
-    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).png"))
-    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value).pdf"))
+    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value)_[$(GFL_bus_list)].png"))
+    savefig(combined, joinpath(simdir, "ieee39_combined_freq_rotor_pm_x$(independent_variable)=$(changing_param_value)_[$(GFL_bus_list)].pdf"))
     @info "Saved combined 3-panel preview" folder = plotsdir
 
     if show_plot
@@ -3422,4 +3426,10 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
     return sys, results
 end
 
-main(independent_variable = "GFL_KW (3 GLF BUS)", changing_param_value = GFL_KW_DEFAULT, GFL_bus_list = GFL_BUSES, show_system = true, show_plot = false, test_frequency_dev_distance = true, test_max_abs_freq = true)
+main(independent_variable = "GFL_KW (3 GLF BUS)", 
+    changing_param_value = GFL_KW_DEFAULT, 
+    GFL_bus_list = GFL_BUSES, 
+    show_system = true, 
+    show_plot = false, 
+    test_frequency_dev_distance = true, 
+    test_max_abs_freq = true)
