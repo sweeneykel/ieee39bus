@@ -1,0 +1,41 @@
+┌ Info: 2026-11-20T11:05:23.657 [19027:1]: Pre-Initializing Simulation States
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:265
+┌ Info: 2026-11-20T11:05:23.721 [19027:1]: The TrustRegionACPowerFlow solver converged after 3 iterations.
+└ @ PowerFlows /home/kelsey-sweeney/.julia/packages/PowerFlows/Ilrf1/src/powerflow_method.jl:314
+┌ Info: 2026-11-20T11:05:24.773 [19027:1]: PowerFlow solve converged, the results have been stored in the system
+└ @ PowerFlows /home/kelsey-sweeney/.julia/packages/PowerFlows/Ilrf1/src/solve_ac_powerflow.jl:62
+┌ Info: 2026-11-20T11:05:37.271 [19027:1]: Residual from initial guess: max = 2.8698342487143425e-10 at 219, total = 8.539514232984001e-8
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/nlsolve_wrapper.jl:115
+┌ Info: 2026-11-20T11:05:37.336 [19027:1]: Initialization non-linear solve succeeded with a tolerance of 1.0e-9 using solver trust_region. Saving solution.
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/nlsolve_wrapper.jl:82
+┌ Info: 2026-11-20T11:05:37.336 [19027:1]: Attaching Perturbations
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:299
+┌ Info: 2026-11-20T11:05:37.675 [19027:1]: Simulations status = BUILT
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:462
+┌ Info: 2026-11-20T11:05:37.675 [19027:1]: 
+│ ──────────────────────────────────────────────────────────────────────────────────────
+│                                                            Time          Allocations  
+│                                                      ───────────────   ───────────────
+│                    Total measured:                        16.8s            1.88GiB    
+│ 
+│ Section                                      ncalls     time    %tot     alloc    %tot
+│ ──────────────────────────────────────────────────────────────────────────────────────
+│ Build Simulation                                  1    16.8s  100.0%   1.88GiB  100.0%
+│   Build Simulation Inputs                         1    2.58s   15.4%    210MiB   10.9%
+│     Wrap Branches                                 1    206ms    1.2%   22.8MiB    1.2%
+│     Wrap Dynamic Injectors                        1    1.80s   10.7%    139MiB    7.2%
+│     Calculate MM, DAE_vector, Total Shunts        1    163ms    1.0%   19.9MiB    1.0%
+│     Wrap Static Injectors                         1    213ms    1.3%   10.0MiB    0.5%
+│   Pre-initialization                              1    5.57s   33.2%    644MiB   33.5%
+│     Power Flow solution                           1    1.10s    6.5%   53.6MiB    2.8%
+│     Initialize Static Injectors                   1   2.37μs    0.0%     64.0B    0.0%
+│     Initialize Dynamic Injectors                  1    4.25s   25.3%    573MiB   29.8%
+│     Initialize Dynamic Branches                   1   61.7μs    0.0%   14.9KiB    0.0%
+│   Calculate Jacobian                              1    3.79s   22.6%    696MiB   36.2%
+│   Make Model Function                             1   4.95ms    0.0%    161KiB    0.0%
+│   Initial Condition NLsolve refinement            1    4.52s   26.9%    333MiB   17.3%
+│   Build Perturbations                             1    150ms    0.9%   22.9MiB    1.2%
+│   Make DiffEq Problem                             1    188ms    1.1%   17.5MiB    0.9%
+│ ──────────────────────────────────────────────────────────────────────────────────────
+│ 
+└ @ PowerSimulationsDynamics /home/kelsey-sweeney/Desktop/originals/39bus (original + added tests)/local_packages/PowerSimulationsDynamics/src/base/simulation.jl:487

@@ -48,11 +48,13 @@ end
 
 simulation_results = ["system_max_abs_freq_dev_x_GFL_KW (3 GLF BUS).csv",
                       "system_max_abs_freq_dev_x_GFL_KW (4 GLF BUS).csv",
-                      "system_max_abs_freq_dev_x_GFL_KW (5 GLF BUS).csv"]
+                      "system_max_abs_freq_dev_x_GFL_KW (5 GLF BUS).csv",
+                      "system_max_abs_freq_dev_x_GFL_KW (6 GLF BUS).csv"]
 
 simulation_name = ["3 GFL",
                    "4 GFL",
-                   "5 GFL"]
+                   "5 GFL",
+                   "6 GFL"]
 
 df = DataFrame(
                 sim_res = simulation_results, 

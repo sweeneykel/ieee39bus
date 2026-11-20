@@ -3384,7 +3384,7 @@ function main(;independent_variable::String, changing_param_value::Float64, GFL_
     return sys, results
 end
 
-main(independent_variable = "GFL_KW (5 GLF BUS)", 
+main(independent_variable = "GFL_KW (6 GLF BUS)", 
     changing_param_value = GFL_KW_DEFAULT, 
     GFL_bus_list = GFL_BUSES, 
     show_system = true, 
